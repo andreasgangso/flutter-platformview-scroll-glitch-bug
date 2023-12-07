@@ -16,7 +16,7 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.StandardMessageCodec
 import io.flutter.plugin.platform.PlatformView
 import io.flutter.plugin.platform.PlatformViewFactory
-
+import android.graphics.Paint
 
 class MainActivity: FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -34,46 +34,28 @@ internal class NativeViewFactory : PlatformViewFactory(StandardMessageCodec.INST
     }
 }
 
+internal class NativeView @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP) constructor(
+    context: Context?, 
+    id: Int, 
+    creationParams: Map<String?, Any?>?
+) : PlatformView {
 
-internal class NativeView @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP) constructor(context: Context?, id: Int, creationParams: Map<String?, Any?>?) : PlatformView {
-    
-    private val view = MSurface(context)
+    private val view = YellowBoxView(context)
 
     override fun getView(): View? {
         return view
     }
 
     override fun dispose() {}
-    inner class MSurface(context: Context?) : SurfaceView(context), SurfaceHolder.Callback {
-        protected fun FillTheCanvas(canvas: Canvas?) {
-            canvas!!.drawColor(Color.RED)
-        }
+}
 
-        override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-            // TODO Auto-generated method stub
-        }
+private class YellowBoxView(context: Context?) : View(context) {
+    private val paint = Paint().apply {
+        color = Color.YELLOW
+    }
 
-        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-        override fun surfaceCreated(holder: SurfaceHolder) {
-            var canvas: Canvas? = null
-            try {
-                canvas = holder.lockCanvas(null)
-                synchronized(holder) { FillTheCanvas(canvas) }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            } finally {
-                if (canvas != null) {
-                    holder.unlockCanvasAndPost(canvas)
-                }
-            }
-        }
-
-        override fun surfaceDestroyed(holder: SurfaceHolder) {
-            // TODO Auto-generated method stub
-        }
-
-        init {
-            holder.addCallback(this)
-        }
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        canvas?.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
     }
 }

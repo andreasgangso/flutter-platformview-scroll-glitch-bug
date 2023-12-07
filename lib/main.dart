@@ -35,62 +35,46 @@ class MyHomePage extends StatelessWidget {
         appBar: AppBar(
           title: Text(title),
         ),
-        body: ListView(
-          children: <Widget>[
-            Column(children: [
-              AspectRatio(
-                aspectRatio: 16 / 9,
-                child: PlatformViewLink(
-                  viewType: 'NativeView',
-                  surfaceFactory: (context, controller) {
-                    return AndroidViewSurface(
-                      controller: controller as AndroidViewController,
-                      hitTestBehavior: PlatformViewHitTestBehavior.opaque,
-                      gestureRecognizers: <
-                          Factory<OneSequenceGestureRecognizer>>{
-                        Factory<OneSequenceGestureRecognizer>(
-                          () => EagerGestureRecognizer(),
-                        ),
-                      },
-                    );
-                  },
-                  onCreatePlatformView: (params) {
-                    var controller =
-                        PlatformViewsService.initExpensiveAndroidView(
-                      id: params.id,
-                      viewType: 'NativeView',
-                      layoutDirection: TextDirection.ltr,
-                      onFocus: () {
-                        params.onFocusChanged(true);
-                      },
-                    );
-                    controller
-                      ..addOnPlatformViewCreatedListener((val) {
-                        params.onPlatformViewCreated(val);
-                      })
-                      ..create();
-                    return controller;
-                  },
-                ),
-              ),
-              SizedBox(
-                height: 100,
-                child: Container(
-                  color: Colors.redAccent,
-                  alignment: Alignment.bottomCenter,
-                  child: const Text('this is the end of the column'),
-                ),
-              ),
-            ]),
-            // Just to create some scrolling:
-            ...List.generate(
+        body: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              ...List.generate(
                 10,
-                (index) => SizedBox(
-                      width: 100,
-                      height: 500,
-                      child: Container(color: Colors.green),
-                    ))
-          ],
+                (index) => Container(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  width: double.infinity,
+                  height: 500,
+                  child: PlatformViewLink(
+                    viewType: 'NativeView',
+                    surfaceFactory: (context, controller) {
+                      return AndroidViewSurface(
+                        controller: controller as AndroidViewController,
+                        hitTestBehavior: PlatformViewHitTestBehavior.opaque,
+                        gestureRecognizers: const <Factory<
+                            OneSequenceGestureRecognizer>>{},
+                      );
+                    },
+                    onCreatePlatformView: (params) {
+                      var controller = PlatformViewsService.initAndroidView(
+                        id: params.id,
+                        viewType: 'NativeView',
+                        layoutDirection: TextDirection.ltr,
+                        onFocus: () {
+                          params.onFocusChanged(true);
+                        },
+                      );
+                      controller
+                        ..addOnPlatformViewCreatedListener((val) {
+                          params.onPlatformViewCreated(val);
+                        })
+                        ..create();
+                      return controller;
+                    },
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     ]);
